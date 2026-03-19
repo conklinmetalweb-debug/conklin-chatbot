@@ -62,100 +62,34 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
 <div class="powered">Powered by Claude AI</div>
 
 <script>
-// ── Step 1: Paste your API key here ──────────────────
-const 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 = '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';
+const CLAUDE_API_KEY = 'PASTE-YOUR-KEY-HERE';
 const SUPPORT_EMAIL  = 'ecomm@conklinmetal.com';
 const COMPANY        = 'Conklin';
 
-// ── Knowledge Base (from E-Commerce Q&A doc) ─────────
 const QA = [
-  {
-    q: "What is the primary objective of the E-Commerce site?",
-    a: "To allow existing and new customers to place orders online. New customers can view the Global Catalog and request quotes. The site also serves as a customer portal where existing customers can log in to check open orders, check current balance, and print & pay invoices."
-  },
-  {
-    q: "Why does the site require cookies?",
-    a: "The site relies on cookies to store small pieces of data on your device to remember information about your visit. Cookies are required for the site to function properly — keeping you logged in, remembering items in your cart, saving preferences, and enabling secure transactions. When you first visit the site, click 'Accept Cookies' to ensure the site functions normally."
-  },
-  {
-    q: "What criteria is required for a product to appear on the site?",
-    a: "Two conditions must both be met:\n1. The product must be STOCKABLE and SELLABLE in P21 at the selected branch.\n2. The item code must be loaded in the PIM (Product Information Management) and assigned to a taxonomy category."
-  },
-  {
-    q: "What products are displayed on the site?",
-    a: "Not all P21 products are in the PIM — products were selected based on current inventory, Phocas sales data (items purchased 5x or more in the last 12 months), and a comparison of the current site's products.\n\nGuest (unauthenticated) users see a GLOBAL CATALOG of all items in the PIM across all Conklin warehouses.\n\nLogged-in (authenticated) users see their respective branch catalog but can change locations to view other warehouses.\n\nProducts can be added or removed upon request. Sort order is customizable."
-  },
-  {
-    q: "What is the Taxonomy and why does it matter?",
-    a: "Each product is assigned a category within Conklin's custom taxonomy. This aids user navigation and search, and improves SEO (Search Engine Optimization)."
-  },
-  {
-    q: "What data is stored in P21 vs. the PIM?",
-    a: "P21 stores: Inventory, Pricing, Item Class, Weights, GL data, etc.\nPIM stores: Product Images, Taxonomy Categories, Attributes (L x W x H, thickness, gauge, diameter, etc.)"
-  },
-  {
-    q: "How are product titles determined?",
-    a: "Product titles are based on Conklin's P21 Extended Descriptions. This data does not sync automatically and must be revised manually as Item Maintenance updates P21. If a product title needs to be changed, notify: Item Maintenance team, Jennifer Ho (PIM Manager), and Justin Evans."
-  },
-  {
-    q: "How are brands assigned to products?",
-    a: "Brands are determined by P21 data. Only one brand can be assigned per item code in the PIM. Generic products (such as Sheet Metal, Spiral Pipe, Fittings) will intentionally not display a brand."
-  },
-  {
-    q: "Where did the product data come from? What do the badges mean?",
-    a: "Product pages may show a badge on the lower right of the image indicating the data source:\n• AD = Affiliated Distributors content subscription\n• Unilog = Unilog content subscription\n• No badge = Conklin data enriched in-house with help from sales and purchasing teams"
-  },
-  {
-    q: "What pricing do guest users see?",
-    a: "Unauthenticated (guest) users see P21 Price Sheet 10 (P10 / List Price that mirrors P1) by default."
-  },
-  {
-    q: "How do customers see their special pricing?",
-    a: "Customers must be logged in to view their contract or P21 Price Sheet pricing."
-  },
-  {
-    q: "What products require a quote and cannot be ordered online?",
-    a: "Sheet Metal: Prices are NOT displayed — requires a quote. Customers cannot checkout online.\nMachinery: Prices ARE displayed but still requires a quote. Customers cannot checkout online."
-  },
-  {
-    q: "Who can place an order online?",
-    a: "A P21 account and website login are both required to checkout and place orders, and to view special pricing. Guest users will be prompted to sign up for an account when they attempt to checkout."
-  },
-  {
-    q: "How is inventory displayed on the site?",
-    a: "Inventory is displayed as 'In Stock' or 'Out of Stock' — the actual count is hidden from customer view."
-  },
-  {
-    q: "How does inventory allocation work when an order is placed online?",
-    a: "Inventory is immediately allocated in P21 once an order is submitted online. If online orders cause strain on branch inventory levels, we have the option to adjust the threshold so items display as 'Out of Stock' once inventory reaches a pre-designated percentage."
-  },
-  {
-    q: "How do consignment warehouses work with E-Commerce?",
-    a: "Consignment warehouses are NOT supported on the E-Commerce platform. Customers with inventory on consignment must place orders for that material through the branch directly."
-  },
-  {
-    q: "Can customers pay invoices online?",
-    a: "Not yet. This will be handled via a separate portal that will be linked on the site once available. Details TBA from Accounting."
-  },
-  {
-    q: "Where do all emails go during testing?",
-    a: "All emails during testing go to ecomm@conklinmetal.com — this includes new account registrations, RFQs, and order confirmations. If you sign up using a Conklin or personal email address you will NOT receive automated emails since they only go to the ecomm@conklinmetal.com inbox."
-  },
-  {
-    q: "What database does the sandbox testing site use?",
-    a: "The sandbox testing site uses a P21 test database with data similar to but separate from the live P21 data. This database is also used for other testing (e.g. Cycle Count app)."
-  },
-  {
-    q: "What is a Web Reference Number?",
-    a: "A Web Reference Number is generated for each online order in addition to the P21 SO#. See the Source Type/ID field in P21."
-  },
-  {
-    q: "What are the current known issues?",
-    a: "• RFQ email confirmation is missing data (including products, quantities, descriptions)\n• Refine results search doesn't allow for partial match\n• Facebook embed on homepage doesn't always appear — being replaced with an Instagram embed that requires customization"
-  }
+  { q: "What is the primary objective of the E-Commerce site?", a: "To allow existing and new customers to place orders online. New customers can view the Global Catalog and request quotes. The site also serves as a customer portal where existing customers can log in to check open orders, check current balance, and print & pay invoices." },
+  { q: "Why does the site require cookies?", a: "The site relies on cookies to store small pieces of data on your device to remember information about your visit. Cookies are required for the site to function properly — keeping you logged in, remembering items in your cart, saving preferences, and enabling secure transactions. When you first visit the site, click 'Accept Cookies' to ensure the site functions normally." },
+  { q: "What criteria is required for a product to appear on the site?", a: "Two conditions must both be met:\n1. The product must be STOCKABLE and SELLABLE in P21 at the selected branch.\n2. The item code must be loaded in the PIM (Product Information Management) and assigned to a taxonomy category." },
+  { q: "What products are displayed on the site?", a: "Not all P21 products are in the PIM — products were selected based on current inventory, Phocas sales data (items purchased 5x or more in the last 12 months), and a comparison of the current site's products.\n\nGuest (unauthenticated) users see a GLOBAL CATALOG of all items in the PIM across all Conklin warehouses.\n\nLogged-in (authenticated) users see their respective branch catalog but can change locations to view other warehouses.\n\nProducts can be added or removed upon request. Sort order is customizable." },
+  { q: "What is the Taxonomy and why does it matter?", a: "Each product is assigned a category within Conklin's custom taxonomy. This aids user navigation and search, and improves SEO (Search Engine Optimization)." },
+  { q: "What data is stored in P21 vs. the PIM?", a: "P21 stores: Inventory, Pricing, Item Class, Weights, GL data, etc.\nPIM stores: Product Images, Taxonomy Categories, Attributes (L x W x H, thickness, gauge, diameter, etc.)" },
+  { q: "How are product titles determined?", a: "Product titles are based on Conklin's P21 Extended Descriptions. This data does not sync automatically and must be revised manually as Item Maintenance updates P21. If a product title needs to be changed, notify: Item Maintenance team, Jennifer Ho (PIM Manager), and Justin Evans." },
+  { q: "How are brands assigned to products?", a: "Brands are determined by P21 data. Only one brand can be assigned per item code in the PIM. Generic products (such as Sheet Metal, Spiral Pipe, Fittings) will intentionally not display a brand." },
+  { q: "Where did the product data come from? What do the badges mean?", a: "Product pages may show a badge on the lower right of the image indicating the data source:\n• AD = Affiliated Distributors content subscription\n• Unilog = Unilog content subscription\n• No badge = Conklin data enriched in-house with help from sales and purchasing teams" },
+  { q: "What pricing do guest users see?", a: "Unauthenticated (guest) users see P21 Price Sheet 10 (P10 / List Price that mirrors P1) by default." },
+  { q: "How do customers see their special pricing?", a: "Customers must be logged in to view their contract or P21 Price Sheet pricing." },
+  { q: "What products require a quote and cannot be ordered online?", a: "Sheet Metal: Prices are NOT displayed — requires a quote. Customers cannot checkout online.\nMachinery: Prices ARE displayed but still requires a quote. Customers cannot checkout online." },
+  { q: "Who can place an order online?", a: "A P21 account and website login are both required to checkout and place orders, and to view special pricing. Guest users will be prompted to sign up for an account when they attempt to checkout." },
+  { q: "How is inventory displayed on the site?", a: "Inventory is displayed as 'In Stock' or 'Out of Stock' — the actual count is hidden from customer view." },
+  { q: "How does inventory allocation work when an order is placed online?", a: "Inventory is immediately allocated in P21 once an order is submitted online. If online orders cause strain on branch inventory levels, we have the option to adjust the threshold so items display as 'Out of Stock' once inventory reaches a pre-designated percentage." },
+  { q: "How do consignment warehouses work with E-Commerce?", a: "Consignment warehouses are NOT supported on the E-Commerce platform. Customers with inventory on consignment must place orders for that material through the branch directly." },
+  { q: "Can customers pay invoices online?", a: "Not yet. This will be handled via a separate portal that will be linked on the site once available. Details TBA from Accounting." },
+  { q: "Where do all emails go during testing?", a: "All emails during testing go to ecomm@conklinmetal.com — this includes new account registrations, RFQs, and order confirmations. If you sign up using a Conklin or personal email address you will NOT receive automated emails since they only go to the ecomm@conklinmetal.com inbox." },
+  { q: "What database does the sandbox testing site use?", a: "The sandbox testing site uses a P21 test database with data similar to but separate from the live P21 data. This database is also used for other testing (e.g. Cycle Count app)." },
+  { q: "What is a Web Reference Number?", a: "A Web Reference Number is generated for each online order in addition to the P21 SO#. See the Source Type/ID field in P21." },
+  { q: "What are the current known issues?", a: "• RFQ email confirmation is missing data (including products, quantities, descriptions)\n• Refine results search doesn't allow for partial match\n• Facebook embed on homepage doesn't always appear — being replaced with an Instagram embed that requires customization" }
 ];
 
-// ── Engine ────────────────────────────────────────────
 let hist = [], busy = false;
 
 function buildPrompt() {
@@ -166,10 +100,9 @@ function buildPrompt() {
 
 function greet() {
   bot(`👋 Hi! I'm the ${COMPANY} AI Assistant. Ask me anything about our E-Commerce site — products, pricing, orders, accounts, and more.`);
-  const chips = QA.slice(0, 4);
   const d = document.createElement('div');
   d.className = 'suggested';
-  d.innerHTML = chips.map(qa => {
+  d.innerHTML = QA.slice(0, 4).map(qa => {
     const lbl = qa.q.length > 42 ? qa.q.slice(0, 42) + '…' : qa.q;
     return `<button class="sq" onclick="quick('${qa.q.replace(/'/g, "\\'")}')">${lbl}</button>`;
   }).join('');
@@ -180,7 +113,7 @@ function greet() {
 function quick(q) { document.getElementById('inp').value = q; send(); }
 
 async function send() {
-  const inp  = document.getElementById('inp');
+  const inp = document.getElementById('inp');
   const text = inp.value.trim();
   if (!text || busy) return;
   inp.value = '';
@@ -196,7 +129,7 @@ async function send() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': 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,
+        'x-api-key': CLAUDE_API_KEY,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
