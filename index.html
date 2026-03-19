@@ -62,9 +62,10 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
 <div class="powered">Powered by Claude AI</div>
 
 <script>
-const CLAUDE_API_KEY = 'PASTE-YOUR-KEY-HERE';
-const SUPPORT_EMAIL  = 'ecomm@conklinmetal.com';
-const COMPANY        = 'Conklin';
+// ── Cloudflare Worker URL (proxy — no API key needed here) ──
+const WORKER_URL   = 'https://lingering-resonance-20ab.conklinmetalweb.workers.dev';
+const SUPPORT_EMAIL = 'ecomm@conklinmetal.com';
+const COMPANY       = 'Conklin';
 
 const QA = [
   { q: "What is the primary objective of the E-Commerce site?", a: "To allow existing and new customers to place orders online. New customers can view the Global Catalog and request quotes. The site also serves as a customer portal where existing customers can log in to check open orders, check current balance, and print & pay invoices." },
@@ -125,13 +126,9 @@ async function send() {
   const tid = 't' + Date.now();
   typing(tid);
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const r = await fetch(WORKER_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': CLAUDE_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 800,
@@ -153,6 +150,7 @@ async function send() {
   } catch(e) {
     del(tid);
     bot('⚠️ Connection error. Please contact ' + SUPPORT_EMAIL);
+    console.error(e);
   }
   busy = false;
   document.getElementById('send-btn').disabled = false;
