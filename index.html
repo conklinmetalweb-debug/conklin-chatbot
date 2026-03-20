@@ -61,154 +61,25 @@ body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display
 <div class="powered">Powered by Claude AI</div>
 
 <script>
+// ── Points to your Cloudflare Worker — no API key needed here ──
 const WORKER_URL    = 'https://lingering-resonance-20ab.conklinmetalweb.workers.dev';
 const SUPPORT_EMAIL = 'ecomm@conklinmetal.com';
-const COMPANY       = 'Conklin';
-
-const QA = [
-
-  // ── COMPANY OVERVIEW ──────────────────────────────────
-  { q: "What is Conklin Metal Industries?",
-    a: "Conklin Metal Industries is a distributor of all types of sheet metal, HVAC & Duct Fabrication Supplies, and Mechanical & Industrial Insulation. Founded in 1874, it is now in its fourth generation as a family-owned and operated business. Conklin services the entire southeastern U.S. out of 15 warehouses, primarily serving commercial contractors." },
-
-  { q: "Where are Conklin's warehouses located?",
-    a: "Conklin operates 15 warehouses across the southeastern United States. Branches include Atlanta (North and West), Memphis TN, Nashville TN, Birmingham AL, Little Rock AR, Charlotte NC, Greenville SC, Knoxville TN, and Orlando FL among others." },
-
-  { q: "What are Conklin's core values?",
-    a: "Conklin's four core values are:\n1. INTEGRITY — Honor commitments, do the right thing, treat everyone with dignity and respect.\n2. INITIATIVE — Be proactive and responsive. Be passionate about improvement with a focus on solutions.\n3. COMMUNICATE — Communicate clearly and respond timely. Listen to understand and shoot straight.\n4. CREATE FANS — Be easy to work with. Be positive. Invest in relationships and be a team player. Have fun!" },
-
-  { q: "What is The Conklin Way?",
-    a: "The Conklin Way is Conklin's cultural framework — 26 fundamentals that describe the daily practices that make their culture come to life. Key fundamentals include: Pursue Excellence, Invest in Relationships, Be Prepared, Deliver Results, Listen to Understand, Shoot Straight, Focus on Solutions, Respond Timely, Pay Attention to Details, Assume Positive Intent, Treat Everyone with Dignity and Respect, Honor Commitments, Do the Right Thing, Be Positive, Communicate Clearly, Create Fans, and Have Fun and Laugh." },
-
-  { q: "What is Conklin's primary goal?",
-    a: "Conklin's goal is to be a world-class distributor and a company where people enjoy and find satisfaction in their work." },
-
-  { q: "What types of customers does Conklin serve?",
-    a: "Conklin serves: Mechanical Contractors (Mech-SM) who fabricate and install HVAC ductwork (50%+ of volume), Mechanical Contractors HVAC (Mech-HVAC) who sub-contract ductwork, Duct Fabricators (DFAB) who fabricate but don't install, Sheet Metal Contractors (SMC) who fabricate and install without a mechanical license, Residential/Commercial Service Add-On Contractors (RCSA), Residential New Construction Contractors (RNC), Roof Curb Manufacturers (Rcurb), and Industrial Air Distribution Contractors (IADC)." },
-
-  { q: "What products does Conklin sell?",
-    a: "Conklin's 8 product lines are:\n1. Coils — flat rolled metal in coil form (95% galvanized)\n2. Sheets — carbon flat rolled sheet products (galvanized, painted, stainless, etc.)\n3. Specialty Metals — stainless steel, aluminum, and copper sheets\n4. Duct Fabrication Supplies — duct liner, flanges, connectors, adhesives, turning vanes, slips & drives\n5. Pipe & Air Distribution Supplies — spiral pipe, fittings, flex duct, grilles, registers, diffusers\n6. HVAC Field Supplies — refrigerant, copper linesets, motors, thermostats, mini splits\n7. Machinery & Tools — sheet metal forming machinery, hand tools, repair parts\n8. Mechanical & Industrial Pipe Insulation — fiberglass, sealants, fire wrap, elastomeric" },
-
-  { q: "What is Conklin's Plan & Spec Division?",
-    a: "The Plan & Spec Division is based in Memphis and provides quotations directly from mechanical plans on commercial projects throughout Conklin's footprint. It was launched in 2019 to service Tennessee and Arkansas, with plans to expand to other markets." },
-
-  // ── E-COMMERCE ────────────────────────────────────────
-  { q: "What is the primary objective of the E-Commerce site?",
-    a: "To allow existing and new customers to place orders online. New customers can view the Global Catalog and request quotes. The site also serves as a customer portal where existing customers can log in to check open orders, check current balance, and print & pay invoices." },
-
-  { q: "Why does the site require cookies?",
-    a: "The site relies on cookies to store small pieces of data on your device. Cookies are required for the site to function properly — keeping you logged in, remembering items in your cart, saving preferences, and enabling secure transactions. When you first visit the site, click 'Accept Cookies' to ensure the site functions normally." },
-
-  { q: "What criteria is required for a product to appear on the site?",
-    a: "Two conditions must both be met:\n1. The product must be STOCKABLE and SELLABLE in P21 at the selected branch.\n2. The item code must be loaded in the PIM and assigned to a taxonomy category." },
-
-  { q: "What products are displayed on the site?",
-    a: "Not all P21 products are in the PIM — products were selected based on current inventory, Phocas sales data (items purchased 5x or more in the last 12 months), and a comparison of the current site's products.\n\nGuest users see a GLOBAL CATALOG of all items across all Conklin warehouses. Logged-in users see their respective branch catalog but can change locations to view other warehouses. Products can be added or removed upon request. Sort order is customizable." },
-
-  { q: "What is the Taxonomy and why does it matter?",
-    a: "Each product is assigned a category within Conklin's custom taxonomy. This aids user navigation and search, and improves SEO (Search Engine Optimization)." },
-
-  { q: "What data is stored in P21 vs. the PIM?",
-    a: "P21 stores: Inventory, Pricing, Item Class, Weights, GL data, etc.\nPIM stores: Product Images, Taxonomy Categories, Attributes (L x W x H, thickness, gauge, diameter, etc.)" },
-
-  { q: "How are product titles determined?",
-    a: "Product titles are based on Conklin's P21 Extended Descriptions. This data does not sync automatically and must be revised manually. If a product title needs to be changed, notify: Item Maintenance team, Jennifer Ho (PIM Manager), and Justin Evans." },
-
-  { q: "How are brands assigned to products?",
-    a: "Brands are determined by P21 data. Only one brand can be assigned per item code in the PIM. Generic products (such as Sheet Metal, Spiral Pipe, Fittings) will intentionally not display a brand." },
-
-  { q: "Where did the product data come from? What do the badges mean?",
-    a: "Product pages may show a badge on the lower right of the image indicating the data source:\n• AD = Affiliated Distributors content subscription\n• Unilog = Unilog content subscription\n• No badge = Conklin data enriched in-house" },
-
-  { q: "What pricing do guest users see?",
-    a: "Unauthenticated (guest) users see P21 Price Sheet 10 (P10 / List Price that mirrors P1) by default." },
-
-  { q: "How do customers see their special pricing?",
-    a: "Customers must be logged in to view their contract or P21 Price Sheet pricing." },
-
-  { q: "What products require a quote and cannot be ordered online?",
-    a: "Sheet Metal: Prices are NOT displayed — requires a quote. Customers cannot checkout online.\nMachinery: Prices ARE displayed but still requires a quote. Customers cannot checkout online." },
-
-  { q: "Who can place an order online?",
-    a: "A P21 account and website login are both required to checkout and place orders. Guest users will be prompted to sign up for an account when they attempt to checkout." },
-
-  { q: "How is inventory displayed on the site?",
-    a: "Inventory is displayed as 'In Stock' or 'Out of Stock' — the actual count is hidden from customer view." },
-
-  { q: "How does inventory allocation work when an order is placed online?",
-    a: "Inventory is immediately allocated in P21 once an order is submitted online. If online orders cause strain on branch inventory levels, we have the option to adjust the threshold so items display as 'Out of Stock' once inventory reaches a pre-designated percentage." },
-
-  { q: "How do consignment warehouses work with E-Commerce?",
-    a: "Consignment warehouses are NOT supported on the E-Commerce platform. Customers with inventory on consignment must place orders through the branch directly." },
-
-  { q: "Can customers pay invoices online?",
-    a: "Not yet. This will be handled via a separate portal that will be linked on the site once available. Details TBA from Accounting." },
-
-  { q: "Where do all emails go during testing?",
-    a: "All emails during testing go to ecomm@conklinmetal.com — this includes new account registrations, RFQs, and order confirmations. If you sign up using a Conklin or personal email address you will NOT receive automated emails." },
-
-  { q: "What database does the sandbox testing site use?",
-    a: "The sandbox testing site uses a P21 test database with data similar to but separate from the live P21 data. This database is also used for other testing (e.g. Cycle Count app)." },
-
-  { q: "What is a Web Reference Number?",
-    a: "A Web Reference Number is generated for each online order in addition to the P21 SO#. See the Source Type/ID field in P21." },
-
-  { q: "What are the current known issues with the E-Commerce site?",
-    a: "• RFQ email confirmation is missing data (including products, quantities, descriptions)\n• Refine results search doesn't allow for partial match\n• Facebook embed on homepage doesn't always appear — being replaced with an Instagram embed" },
-
-  // ── WHO'S WHO — DEPARTMENTS ───────────────────────────
-  { q: "Who handles IT support and technical issues?",
-    a: "Contact the IT Department:\n• Derek (Technical Analyst, Ext. 2050) — First point of contact for most issues including Sage, Outlook, Office, file permissions, email, phones. All technical questions should be routed through Derek first so they can be logged.\n• Randy (Business Intelligence Analyst) — For business data questions, dashboards in Phocas/Tableau/SQL, reports, data integration projects.\n• IT Director (Ext. 1694) — Oversees asset management, purchasing, vendor contracts, database/server/network management." },
-
-  { q: "Who handles accounting and finance questions?",
-    a: "Contact the Accounting Department:\n• Controller (Ext. 2003) — Oversees AP/AR, month-end closing, journal entries, auditing, business licenses, property taxes.\n• Assistant Controller (Ext. 2044) — Handles credit cards, expense management (Concur), payroll wires, fixed assets, sales and use tax, bank reconciliations." },
-
-  { q: "Who handles credit, collections, and new accounts?",
-    a: "Contact the Credit Department:\n• Credit Manager (Jean, Ext. 2001) — Reviews terms accounts, sets credit lines, manages collections, lien waivers, credit meetings, NACM reporting, new COD/terms/job accounts.\n• Credit Assistant (Tonni, Ext. 2013) — Releases orders, processes finance charges, handles electronic payments, sends invoice copies." },
-
-  { q: "Who handles HR, hiring, and payroll questions?",
-    a: "Contact Human Resources:\n• Director of HR — Handles high-level HR issues, compliance, payroll, benefits administration, annual reviews, sensitive HR matters, discipline and terminations.\n• HR Manager — Day-to-day HR, recruitment, job postings, onboarding/offboarding, culture initiatives, drug screenings, general benefits and payroll questions via Paycom." },
-
-  { q: "Who handles purchasing and steel orders?",
-    a: "Contact the Purchasing Department:\n• Jamie Paden (Purchasing Manager - Steel, Ext. 1614, Cell: 678-850-0841) — Steel POs, mill orders, inventory management, mill certs, steel warranties and claims, steel spot orders.\n• Purchasing Manager - Supplies (Cell: 615-331-6371) — HVAC Fab Supplies, Air Distribution Supplies, Machinery inventory; vendors including Ductmate, Durodyne, Greenseam, sealants, adhesives, spiral elbows, strut." },
-
-  { q: "Who handles pricing, item maintenance, and contracts?",
-    a: "Contact the Pricing Team:\n• Pricing Manager — Leads item maintenance, item descriptions, UOM issues, new item creation, price sheet updates, contract creation, customer price groups, low margin order evaluation.\n• Product & Pricing Coordinator (Ext. 1230) — Vendor pricing in location costs, new inventory items, location costs/weights/vendor part numbers, insulation & flex duct purchasing." },
-
-  { q: "Who handles marketing, the website, and social media?",
-    a: "Contact the Marketing Director:\n• Manages website (product/pricing updates, spec sheets, item codes, blogs), website sales and chat support, social media (Instagram, Facebook, YouTube, Twitter, LinkedIn, TikTok), newsletters via MailChimp, graphic design (linecards, flyers, calendars), and Google/Apple Maps listings." },
-
-  { q: "Who handles safety incidents and OSHA compliance?",
-    a: "Contact the Safety Department:\n• Corporate Safety Manager (Ext. 2002) — First point of contact for ALL incidents (auto or occupational), work-related injuries, safety training, OSHA inquiries, fleet compliance, DOT/FMCSA inquiries, Samsara fleet management, PPE and warehouse safety supplies." },
-
-  { q: "Who leads the sales team?",
-    a: "Sales Leadership:\n• Director of Sales & Business Development (Cell: 404-405-6511) — Oversees market strategy, vendor rebate negotiations, hiring and training TMs, territory reviews, industry events (AHR Show, AD Meetings, HARDI).\n• Regional Sales Managers — One covers Memphis TN, Nashville TN, Birmingham AL, and Little Rock AR. Another covers Charlotte NC, Greenville SC, Knoxville TN, and Georgia branches." },
-
-  { q: "Who is the executive leadership team?",
-    a: "Conklin's executive leadership includes:\n• President/CEO — Manages overall culture, strategy, and performance. Oversees steel purchasing strategy, pricing system, banking and insurance relationships. Represents Conklin at AD and HARDI.\n• Executive Vice President — Oversees Sales and Territory Managers, manages customer relationships at the corporate level, manages the Conklin website, oversees educational initiatives.\n• Vice President of Operations — Ultimate responsibility for all company operations, manages all 15 branch managers, logistics, IT department, and all physical assets." },
-
-  { q: "Who do I contact for E-Commerce questions or issues?",
-    a: "For E-Commerce questions, email ecomm@conklinmetal.com. This inbox receives all test emails including new account registrations, RFQs, and order confirmations. For PIM/product questions contact Jennifer Ho (PIM Manager) and Justin Evans." },
-
-];
 
 let hist = [], busy = false;
 
-function buildPrompt() {
-  let p = `You are a friendly, professional assistant for ${COMPANY} Metal Industries. Answer questions ONLY using the knowledge base below — which covers company info, E-Commerce, products, departments, and the Who's Who staff directory. If the question is not covered, reply with exactly: ESCALATE: [brief reason]. Be concise and helpful.\n\nKNOWLEDGE BASE:\n`;
-  QA.forEach((qa, i) => p += `\nQ${i+1}: ${qa.q}\nA${i+1}: ${qa.a}\n`);
-  return p;
-}
-
 function greet() {
-  bot(`👋 Hi! I'm the Conklin AI Assistant. I can help with E-Commerce questions, company info, products, and finding the right person to contact. What can I help you with?`);
-  const chips = [QA[0], QA[4], QA[8], QA[28]];
+  bot("👋 Hi! I'm the Conklin AI Assistant. I can help with E-Commerce questions, company info, products, and finding the right person to contact. What can I help you with?");
+  const suggestions = [
+    "What is Conklin Metal Industries?",
+    "Who handles IT support?",
+    "What products require a quote?",
+    "How does inventory allocation work?"
+  ];
   const d = document.createElement('div');
   d.className = 'suggested';
-  d.innerHTML = chips.map(qa => {
-    const lbl = qa.q.length > 42 ? qa.q.slice(0, 42) + '…' : qa.q;
-    return `<button class="sq" onclick="quick('${qa.q.replace(/'/g, "\\'")}')">${lbl}</button>`;
-  }).join('');
+  d.innerHTML = suggestions.map(q =>
+    `<button class="sq" onclick="quick('${q}')">${q}</button>`
+  ).join('');
   document.getElementById('msgs').appendChild(d);
   scroll();
 }
@@ -234,7 +105,6 @@ async function send() {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 800,
-        system: buildPrompt(),
         messages: hist
       })
     });
