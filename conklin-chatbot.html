@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conklin AI Assistant</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#1a4d8f;--accent-light:#e8eef8;--bg:#f5f4f1;--surface:#ffffff;--border:#e2e0d8;--text:#1a1917;--text2:#5c5a52;--text3:#9c9a8e}
+html,body{height:100%;overflow:hidden}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);display:flex;flex-direction:column;font-size:14px;color:var(--text)}
+.header{background:var(--accent);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.header-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header-avatar svg{width:17px;height:17px;stroke:white;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.header-name{font-size:14px;font-weight:600;color:white;flex:1}
+.header-status{font-size:11px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:4px}
+.header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block}
+.lang-toggle{display:flex;align-items:center;gap:0;background:rgba(255,255,255,0.15);border-radius:20px;padding:2px;flex-shrink:0}
+.lang-btn{padding:4px 12px;border:none;background:transparent;color:rgba(255,255,255,0.75);font-size:12px;font-weight:600;cursor:pointer;border-radius:18px;transition:all .2s;font-family:inherit}
+.lang-btn.active{background:white;color:var(--accent)}
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.messages::-webkit-scrollbar{width:3px}
+.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.msg{display:flex;gap:8px;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{justify-content:flex-end}
+.av{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px}
+.bot .av{background:var(--accent);color:white}
+.user .av{background:var(--bg);border:1px solid var(--border);color:var(--text3)}
+.bubble{padding:9px 13px;border-radius:12px;font-size:13.5px;line-height:1.6;max-width:80%;word-break:break-word}
+.bot .bubble{background:var(--surface);border:1px solid var(--border);border-top-left-radius:3px}
+.user .bubble{background:var(--accent);color:white;border-top-right-radius:3px}
+.escalate{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:9px 13px;font-size:12.5px;line-height:1.6;color:#78350f;max-width:85%}
+.escalate strong{display:block;margin-bottom:3px;color:#92400e}
+.escalate a{color:var(--accent);text-decoration:none;font-weight:500}
+.suggested{display:flex;flex-wrap:wrap;gap:5px}
+.sq{padding:5px 11px;border:1px solid var(--border);background:var(--surface);border-radius:16px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s}
+.sq:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.typing{display:flex;align-items:center;gap:3px}
+.typing span{width:5px;height:5px;background:var(--text3);border-radius:50%;animation:bop 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+.input-row{padding:10px 12px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:7px;flex-shrink:0}
+#inp{flex:1;padding:9px 14px;border:1px solid var(--border);border-radius:20px;font-size:13.5px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s}
+#inp:focus{border-color:var(--accent);background:white}
+#inp::placeholder{color:var(--text3)}
+#send-btn{padding:9px 18px;background:var(--accent);color:white;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
+#send-btn:hover{opacity:.88}
+#send-btn:disabled{opacity:.4;cursor:not-allowed}
+.powered{text-align:center;padding:5px;font-size:10px;color:var(--text3);border-top:1px solid var(--bg);flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-avatar"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+  <div style="flex:1">
+    <div class="header-name" id="header-name">Conklin Assistant</div>
+    <div class="header-status" id="header-status">Online — AI powered</div>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-es" onclick="setLang('es')">ES</button>
+  </div>
+</div>
+<div class="messages" id="msgs"></div>
+<div class="input-row">
+  <input id="inp" autocomplete="off" onkeydown="if(event.key==='Enter')send()"/>
+  <button id="send-btn" onclick="send()">Send</button>
+</div>
+<div class="powered" id="powered-txt">Powered by Claude AI</div>
+
+<script>
+const WORKER_URL    = 'https://lingering-resonance-20ab.conklinmetalweb.workers.dev';
+const SUPPORT_EMAIL = 'ecomm@conklinmetal.com';
+
+// ── Language strings ──────────────────────────────────
+const STRINGS = {
+  en: {
+    headerName:    'Conklin Assistant',
+    headerStatus:  'Online — AI powered',
+    placeholder:   'Ask a question…',
+    send:          'Send',
+    powered:       'Powered by Claude AI',
+    greeting:      '👋 Hi! I\'m the Conklin AI Assistant. I can help with E-Commerce questions, company info, products, branch contacts, and more. What can I help you with?',
+    noAnswer:      "I don\'t have a specific answer for that in my knowledge base.",
+    escalateTitle: '🙋 Connecting you to a team member',
+    escalateContact: 'Contact us:',
+    connError:     '⚠️ Connection error. Please contact ',
+    apiError:      '⚠️ API error: ',
+    langInstruct:  'Respond in English.',
+  },
+  es: {
+    headerName:    'Asistente Conklin',
+    headerStatus:  'En línea — Impulsado por IA',
+    placeholder:   'Haz una pregunta…',
+    send:          'Enviar',
+    powered:       'Impulsado por Claude AI',
+    greeting:      '👋 ¡Hola! Soy el Asistente de IA de Conklin. Puedo ayudarte con preguntas sobre E-Commerce, información de la empresa, productos, contactos de sucursales y más. ¿En qué puedo ayudarte?',
+    noAnswer:      'No tengo una respuesta específica para eso en mi base de conocimiento.',
+    escalateTitle: '🙋 Conectándote con un miembro del equipo',
+    escalateContact: 'Contáctanos:',
+    connError:     '⚠️ Error de conexión. Por favor contacta a ',
+    apiError:      '⚠️ Error de API: ',
+    langInstruct:  'Responde siempre en español.',
+  }
+};
+
+let lang = 'en';
+let hist = [], busy = false;
+
+function setLang(l) {
+  lang = l;
+  const s = STRINGS[l];
+  document.getElementById('header-name').textContent    = s.headerName;
+  document.getElementById('header-status').textContent  = s.headerStatus;
+  document.getElementById('inp').placeholder            = s.placeholder;
+  document.getElementById('send-btn').textContent       = s.send;
+  document.getElementById('powered-txt').textContent    = s.powered;
+  document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  document.getElementById('btn-es').classList.toggle('active', l === 'es');
+}
+
+function greet() {
+  bot(STRINGS[lang].greeting);
+  const suggestions = {
+    en: ["What is Conklin Metal Industries?", "Who is the branch manager at Memphis?", "What is the PTO policy?", "How does inventory allocation work?"],
+    es: ["¿Qué es Conklin Metal Industries?", "¿Quién es el gerente de la sucursal en Memphis?", "¿Cuál es la política de PTO?", "¿Cómo funciona la asignación de inventario?"]
+  };
+  const d = document.createElement('div');
+  d.className = 'suggested';
+  d.innerHTML = suggestions[lang].map(q =>
+    `<button class="sq" onclick="quick('${q.replace(/'/g,"\\'")}')">${q}</button>`
+  ).join('');
+  document.getElementById('msgs').appendChild(d);
+  scroll();
+}
+
+function quick(q) { document.getElementById('inp').value = q; send(); }
+
+async function send() {
+  const inp  = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text || busy) return;
+  inp.value = '';
+  document.querySelectorAll('.suggested').forEach(e => e.remove());
+  user(text);
+  hist.push({ role: 'user', content: text });
+  busy = true;
+  document.getElementById('send-btn').disabled = true;
+  const tid = 't' + Date.now();
+  typing(tid);
+  try {
+    const r = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        lang: lang,
+        messages: hist
+      })
+    });
+    const data = await r.json();
+    del(tid);
+    if (data.error) { bot(STRINGS[lang].apiError + data.error.message); return; }
+    const reply = data.content?.map(c => c.text || '').join('') || 'No response received.';
+    hist.push({ role: 'assistant', content: reply });
+    if (reply.startsWith('ESCALATE:')) {
+      bot(STRINGS[lang].noAnswer);
+      escalateMsg(reply.replace('ESCALATE:', '').trim());
+    } else {
+      bot(reply);
+    }
+  } catch(e) {
+    del(tid);
+    bot(STRINGS[lang].connError + SUPPORT_EMAIL);
+    console.error(e);
+  }
+  busy = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('inp').focus();
+}
+
+function user(t) { add('user', `<div class="bubble">${esc(t)}</div><div class="av">You</div>`); }
+function bot(t)  { add('bot',  `<div class="av">AI</div><div class="bubble">${t.replace(/\n/g,'<br>')}</div>`); }
+function escalateMsg(r) {
+  const s = STRINGS[lang];
+  const d = document.createElement('div');
+  d.innerHTML = `<div class="escalate"><strong>${s.escalateTitle}</strong>${r ? r+'<br><br>' : ''}${s.escalateContact} <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a></div>`;
+  document.getElementById('msgs').appendChild(d); scroll();
+}
+function typing(id) { add('bot', `<div class="av">AI</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`, id); }
+function add(cls, html, id='') { const d=document.createElement('div'); d.className='msg '+cls; if(id)d.id=id; d.innerHTML=html; document.getElementById('msgs').appendChild(d); scroll(); }
+function del(id) { const e=document.getElementById(id); if(e)e.remove(); }
+function scroll() { const m=document.getElementById('msgs'); m.scrollTop=m.scrollHeight; }
+function esc(s)  { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Init
+setLang('en');
+greet();
+</script>
+</body>
+</html>
